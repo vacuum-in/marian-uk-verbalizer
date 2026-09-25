@@ -1,0 +1,27 @@
+experiment_name: e30-orthographic-canonicalization
+seed: 3001
+train_data: data/e30_canonical_orthography/train.parquet
+validation_data: data/e30_canonical_orthography/validation.parquet
+tokenizer: artifacts/tokenizers/spm-16k
+model_config: configs/model/marian-small-scaled.yaml
+output_dir: outputs/e30-orthographic-canonicalization
+input_preprocessing: model-routing-v1
+epochs: 2
+learning_rate: 0.000005
+weight_decay: 0.01
+warmup_ratio: 0.03
+label_smoothing: 0.0
+max_source_tokens: 384
+max_target_tokens: 384
+# Reduced footprint: the card is shared with an unrelated job holding 4.2 GB.
+# Effective batch is preserved via gradient accumulation.
+max_batch_tokens: 2048
+max_batch_examples: 8
+gradient_accumulation_steps: 2
+gradient_clipping: 1.0
+precision: bf16
+num_workers: 0
+log_steps: 200
+eval_steps: 2000
+eval_max_batches: 128
+save_steps: 2000

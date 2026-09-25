@@ -1,0 +1,16 @@
+{
+  "change_name": "experiment-marian-uk-verbalizer",
+  "files": [
+    "openspec/changes/experiment-marian-uk-verbalizer/proposal.md",
+    "openspec/changes/experiment-marian-uk-verbalizer/design.md",
+    "openspec/changes/experiment-marian-uk-verbalizer/tasks.md",
+    "openspec/changes/experiment-marian-uk-verbalizer/specs/ukrainian-verbalization/spec.md",
+    "README.md"
+  ],
+  "assumptions": [
+    "Primary dataset is skypro1111/ubertext-2-news-verbalized.",
+    "Latin words and configured abbreviations must be preserved.",
+    "Stress placement is out of scope.",
+    "Target deployment is CPU-first with CTranslate2 INT8 evaluation."
+  ]
+}

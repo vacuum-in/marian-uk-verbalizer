@@ -1,0 +1,31 @@
+# E46 adds to E45 (data/e46_spans, 491,508 rows) dash-joined number pairs that
+# are not quantity ranges, which E45 reads at 50% in books:
+#  - 4,000 lifespans after names mined from training books ("Рікард (1907–1940)");
+#  - 1,956 sports scores, alone and in lists ("14-1, 24-3");
+#  - 1,416 hyphenated article numbers ("статті 122-1").
+# Each pair is read as two cardinals joined by a dash. Fine-tuned from E45.
+experiment_name: e46-spans
+seed: 4601
+train_data: data/e46_spans/train.parquet
+validation_data: data/e46_spans/dev-stratified.parquet
+output_dir: outputs/e46-spans
+tokenizer: artifacts/tokenizers/spm-16k
+model_config: configs/model/marian-base-scaled.yaml
+input_preprocessing: model-routing-v1
+epochs: 2
+learning_rate: 0.00005
+weight_decay: 0.01
+warmup_ratio: 0.02
+label_smoothing: 0.0
+max_source_tokens: 384
+max_target_tokens: 384
+max_batch_tokens: 4096
+max_batch_examples: 16
+gradient_accumulation_steps: 2
+gradient_clipping: 1.0
+precision: bf16
+num_workers: 0
+log_steps: 500
+eval_steps: 3000
+eval_max_batches: 128
+save_steps: 3000

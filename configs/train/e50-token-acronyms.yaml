@@ -1,0 +1,32 @@
+# E50 adds to E49 (data/e50_token_acronyms): acronyms that are single tokens in
+# the 16k vocabulary (ФБР, ФСБ, СБУ, МВС ... 86 letter-spelled shapes taken from
+# the tokenizer itself). The model cannot see letters inside a whole token, so
+# E49 fixed random acronyms but not real ones. 3,302 rows added; 423 targets
+# that left such an acronym unread corrected to the letter reading.
+# Note: acronyms in reports/domain-eval/acronyms.jsonl now appear in training
+# (in different sentences), because each whole-token acronym must be learned.
+experiment_name: e50-token-acronyms
+seed: 5001
+train_data: data/e50_token_acronyms/train.parquet
+validation_data: data/e50_token_acronyms/dev-stratified.parquet
+output_dir: outputs/e50-token-acronyms
+tokenizer: artifacts/tokenizers/spm-16k
+model_config: configs/model/marian-base-scaled.yaml
+input_preprocessing: model-routing-v1
+epochs: 2
+learning_rate: 0.00005
+weight_decay: 0.01
+warmup_ratio: 0.02
+label_smoothing: 0.0
+max_source_tokens: 384
+max_target_tokens: 384
+max_batch_tokens: 4096
+max_batch_examples: 16
+gradient_accumulation_steps: 2
+gradient_clipping: 1.0
+precision: bf16
+num_workers: 0
+log_steps: 500
+eval_steps: 3000
+eval_max_batches: 128
+save_steps: 3000

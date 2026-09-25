@@ -1,0 +1,41 @@
+# E36b: same corpus as E36, but fine-tuned from E35 at a small memory footprint.
+#
+# E36 tried a clean 12-epoch from-scratch run and hit the third CUDA fault of
+# the session at step ~4,500. dmesg gives the real cause, and it is not the GPU:
+#
+#   misc dxg: dxgk: dxgkio_make_resident: Ioctl failed: -12   (ENOMEM)
+#
+# That is WSL2's GPU paravirtualization layer failing to make allocations
+# resident against Windows-host VRAM pressure. The card is healthy -- 50 C, no
+# throttling, no ECC errors -- and Linux has 28 GB free. Every run this session
+# that stayed near 3 GB of VRAM completed (E30 20,544 steps, E31 33,188 steps);
+# the three that used 5-6 GB all faulted.
+#
+# So: batch back to the 4096/16 footprint that never faulted, num_workers 0 to
+# drop the dataloader copies, and a fine-tune from E35 rather than 112,085
+# from-scratch steps, because a 2.8-hour run is not viable at this fault rate.
+experiment_name: e36b-clean-long
+seed: 3602
+train_data: data/e36_cmudict_growth/train.parquet
+validation_data: data/e36_cmudict_growth/dev-stratified.parquet
+tokenizer: artifacts/tokenizers/spm-16k
+model_config: configs/model/marian-base-scaled.yaml
+output_dir: outputs/e36b-clean-long
+input_preprocessing: model-routing-v1
+epochs: 2
+learning_rate: 0.00005
+weight_decay: 0.01
+warmup_ratio: 0.02
+label_smoothing: 0.0
+max_source_tokens: 384
+max_target_tokens: 384
+max_batch_tokens: 4096
+max_batch_examples: 16
+gradient_accumulation_steps: 2
+gradient_clipping: 1.0
+precision: bf16
+num_workers: 0
+log_steps: 500
+eval_steps: 3000
+eval_max_batches: 128
+save_steps: 3000

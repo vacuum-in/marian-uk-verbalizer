@@ -1,0 +1,33 @@
+# E44 adds to E43 (data/e44_numeric_gaps, 462,459 rows) the numeric gaps the
+# book set exposed. E43 inflates short bare numbers ("[265]" -> "дві тисячі
+# двісті шістдесят п'ять", "1997 року" -> "один мільйон ..."):
+#  - 4,693 footnote markers [n]/{n}, alone and after a word in book sentences;
+#  - 3,000 runs of separate small numbers ("83 72 91");
+#  - 4,730 years in prose, inflected ("1997 року", "у 1782 році", "2008-го");
+#  - 1,832 sentence-final decimals.
+# Fine-tuned from E43 on the RTX 5090.
+experiment_name: e44-numeric-gaps
+seed: 4401
+train_data: data/e44_numeric_gaps/train.parquet
+validation_data: data/e44_numeric_gaps/dev-stratified.parquet
+output_dir: outputs/e44-numeric-gaps
+tokenizer: artifacts/tokenizers/spm-16k
+model_config: configs/model/marian-base-scaled.yaml
+input_preprocessing: model-routing-v1
+epochs: 2
+learning_rate: 0.00005
+weight_decay: 0.01
+warmup_ratio: 0.02
+label_smoothing: 0.0
+max_source_tokens: 384
+max_target_tokens: 384
+max_batch_tokens: 4096
+max_batch_examples: 16
+gradient_accumulation_steps: 2
+gradient_clipping: 1.0
+precision: bf16
+num_workers: 0
+log_steps: 500
+eval_steps: 3000
+eval_max_batches: 128
+save_steps: 3000

@@ -1,0 +1,25 @@
+experiment_name: e1-marian-small-16k-raw-identity15
+seed: 17
+train_data: data/pilot/train.parquet
+validation_data: data/pilot/validation.parquet
+tokenizer: artifacts/tokenizers/spm-16k
+model_config: configs/model/marian-small.yaml
+output_dir: outputs/e1-marian-small-16k-raw-identity15
+epochs: 2
+learning_rate: 0.0005
+weight_decay: 0.01
+warmup_ratio: 0.05
+label_smoothing: 0.1
+max_source_tokens: 256
+max_target_tokens: 384
+max_batch_tokens: 4096
+max_batch_examples: 16
+gradient_accumulation_steps: 4
+gradient_clipping: 1.0
+precision: bf16
+num_workers: 0
+log_steps: 10
+eval_steps: 250
+eval_max_batches: 64
+save_steps: 250
+

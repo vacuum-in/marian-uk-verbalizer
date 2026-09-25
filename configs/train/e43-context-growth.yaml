@@ -1,0 +1,32 @@
+# E43 adds to E42 (data/e43_context_growth, 448,204 rows):
+#  - 20,000 more cards/IBANs/phones/coordinates inside training-book sentences,
+#    with more connectors and identifiers at the start of the sentence;
+#  - 8,000 more English lists of 5-12 words.
+# E42 reads identifiers inside held-out book sentences at 84.4% (E41 49.8%);
+# the misses are mostly damage to the words around the number.
+# Fine-tuned from E42 on the RTX 5090.
+experiment_name: e43-context-growth
+seed: 4301
+train_data: data/e43_context_growth/train.parquet
+validation_data: data/e43_context_growth/dev-stratified.parquet
+output_dir: outputs/e43-context-growth
+tokenizer: artifacts/tokenizers/spm-16k
+model_config: configs/model/marian-base-scaled.yaml
+input_preprocessing: model-routing-v1
+epochs: 2
+learning_rate: 0.00005
+weight_decay: 0.01
+warmup_ratio: 0.02
+label_smoothing: 0.0
+max_source_tokens: 384
+max_target_tokens: 384
+max_batch_tokens: 4096
+max_batch_examples: 16
+gradient_accumulation_steps: 2
+gradient_clipping: 1.0
+precision: bf16
+num_workers: 0
+log_steps: 500
+eval_steps: 3000
+eval_max_batches: 128
+save_steps: 3000

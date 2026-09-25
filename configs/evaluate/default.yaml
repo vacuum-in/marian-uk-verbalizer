@@ -1,0 +1,22 @@
+name: pilot-validation-composite-v1
+weights:
+  exact_match: 0.15
+  character_3gram_f1: 0.15
+  identity_accuracy: 0.20
+  inverse_cer: 0.15
+  inverse_wer: 0.10
+  inverse_semantic_flag_rate: 0.15
+  inverse_repetition_loop_rate: 0.05
+  inverse_punctuation_corruption_rate: 0.025
+  inverse_output_truncation_rate: 0.025
+safety_gates:
+  empty_prediction_rate: 0.0
+  likely_deletion_rate: 0.01
+  likely_insertion_rate: 0.01
+  repetition_loop_rate: 0.001
+  invalid_unicode_rate: 0.0
+  output_truncation_rate: 0.0
+notes:
+  - Freeze this validation score before evaluating the selected checkpoint on weak gold.
+  - Semantic flags are preliminary and should be interpreted relative to the reference floor.
+  - A checkpoint that fails any safety gate is ineligible regardless of aggregate score.

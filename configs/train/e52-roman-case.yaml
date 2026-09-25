@@ -1,0 +1,30 @@
+# E52 = E51 + Roman ordinals agreeing with the following noun in case and gender
+# (data/e52_roman_case). User report: "прочитати XX розділ" -> "двадцятого розділ"
+# (should be accusative "двадцятий розділ"); E51 also gives "дев'ятої главу",
+# "в третій акті". Rows from scripts/roman_case.py: all 6 cases x 3 genders,
+# I..XXXIX, num2words + pymorphy3, value cross-checked. Fine-tuned from E51.
+experiment_name: e52-roman-case
+seed: 5201
+train_data: data/e52_roman_case/train.parquet
+validation_data: data/e52_roman_case/dev-stratified.parquet
+output_dir: outputs/e52-roman-case
+tokenizer: artifacts/tokenizers/spm-16k
+model_config: configs/model/marian-base-scaled.yaml
+input_preprocessing: model-routing-v1
+epochs: 2
+learning_rate: 0.00005
+weight_decay: 0.01
+warmup_ratio: 0.02
+label_smoothing: 0.0
+max_source_tokens: 384
+max_target_tokens: 384
+max_batch_tokens: 4096
+max_batch_examples: 16
+gradient_accumulation_steps: 2
+gradient_clipping: 1.0
+precision: bf16
+num_workers: 0
+log_steps: 500
+eval_steps: 3000
+eval_max_batches: 128
+save_steps: 3000

@@ -1,0 +1,33 @@
+# E48: combined, rebalanced run from E46 (data/e48_rebalanced, 525,106 rows).
+#  - NBSP fix: the tokenizer maps U+00A0 to <unk>; targets kept NBSP, so the
+#    model emitted <unk> -> nothing and glued "в окулярах" into "вокулярах"
+#    (114 of E46's 125 book-prose failures). Targets now use ordinary spaces;
+#    10,000 NBSP-augmented prose rows added.
+#  - English boost: 16,000 rows (in sentences, lists, pairs) after English
+#    slipped in E44/E47.
+#  - Includes the E47 money / 4-digit pair / currency-range rows.
+experiment_name: e48-rebalanced
+seed: 4801
+train_data: data/e48_rebalanced/train.parquet
+validation_data: data/e48_rebalanced/dev-stratified.parquet
+output_dir: outputs/e48-rebalanced
+tokenizer: artifacts/tokenizers/spm-16k
+model_config: configs/model/marian-base-scaled.yaml
+input_preprocessing: model-routing-v1
+epochs: 2
+learning_rate: 0.00005
+weight_decay: 0.01
+warmup_ratio: 0.02
+label_smoothing: 0.0
+max_source_tokens: 384
+max_target_tokens: 384
+max_batch_tokens: 4096
+max_batch_examples: 16
+gradient_accumulation_steps: 2
+gradient_clipping: 1.0
+precision: bf16
+num_workers: 0
+log_steps: 500
+eval_steps: 3000
+eval_max_batches: 128
+save_steps: 3000

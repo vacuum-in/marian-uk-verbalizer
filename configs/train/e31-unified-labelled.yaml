@@ -1,0 +1,33 @@
+# E31 isolates the data recovery: same architecture as E30, but trained on the
+# full labelled HF split (167,893 rows / 169 categories) instead of the E24
+# router-filtered corpus (118,007 rows / 9 categories), plus the 96,760
+# sentences the old routing pipeline had excluded.
+#
+# Capacity is deliberately held constant so the corpus change is attributable.
+# Scaling to marian-base is E32, on whichever corpus wins here.
+experiment_name: e31-unified-labelled
+seed: 3101
+train_data: data/e31_unified_labelled/train.parquet
+validation_data: data/e31_unified_labelled/dev-stratified.parquet
+tokenizer: artifacts/tokenizers/spm-16k
+model_config: configs/model/marian-small-scaled.yaml
+output_dir: outputs/e31-unified-labelled
+input_preprocessing: model-routing-v1
+epochs: 2
+learning_rate: 0.000008
+weight_decay: 0.01
+warmup_ratio: 0.03
+label_smoothing: 0.0
+max_source_tokens: 384
+max_target_tokens: 384
+# Reduced footprint: the card is shared with an unrelated job holding 4.2 GB.
+max_batch_tokens: 2048
+max_batch_examples: 8
+gradient_accumulation_steps: 2
+gradient_clipping: 1.0
+precision: bf16
+num_workers: 0
+log_steps: 200
+eval_steps: 3000
+eval_max_batches: 128
+save_steps: 3000

@@ -1,0 +1,31 @@
+# E53 = E52 + 12,383 Roman-ordinal agreement rows with many governors per case
+# (data/e53_roman_rich). E52 fixed accusative (92%), nominative and locative
+# (100%) but dative stayed at 7%, instrumental 60%, genitive 72%: with 2-3
+# frames per case the model keyed on the preposition instead of the noun ending.
+# Now 9-22 governors per case (verbs, nouns, prepositions), weighted to
+# dative/instrumental/genitive. Held-out roman_case frames are never used.
+experiment_name: e53-roman-rich
+seed: 5301
+train_data: data/e53_roman_rich/train.parquet
+validation_data: data/e53_roman_rich/dev-stratified.parquet
+output_dir: outputs/e53-roman-rich
+tokenizer: artifacts/tokenizers/spm-16k
+model_config: configs/model/marian-base-scaled.yaml
+input_preprocessing: model-routing-v1
+epochs: 2
+learning_rate: 0.00005
+weight_decay: 0.01
+warmup_ratio: 0.02
+label_smoothing: 0.0
+max_source_tokens: 384
+max_target_tokens: 384
+max_batch_tokens: 4096
+max_batch_examples: 16
+gradient_accumulation_steps: 2
+gradient_clipping: 1.0
+precision: bf16
+num_workers: 0
+log_steps: 500
+eval_steps: 3000
+eval_max_batches: 128
+save_steps: 3000

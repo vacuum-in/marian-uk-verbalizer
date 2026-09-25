@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv*/
+venv/
+
+# Training artifacts and experiment outputs (large, regenerable; not published here)
+outputs/
+mlruns/
+logs/
+
+# Datasets (large; the public HF source is downloaded, not checked in;
+# generated/book-derived rows are rebuilt from scripts, not committed)
+data/
+
+# Evaluation reports (large; contain book-derived sentences in some files —
+# see AGENT.md / README for the policy on not redistributing book text)
+reports/
+
+# Local scratch / secrets
+.env
+*.env
+scratchpad/
+*.log
+
+# Staged Hugging Face model releases (large binaries; published to HF Hub,
+# not to this git repo)
+hf_release/
+
+# Gemma distillation-teacher artifacts (an earlier, abandoned experiment path;
+# large binaries, not used by the current Marian training pipeline) and the
+# tokenizer training corpus (large text dump, not code)
+artifacts/teachers/
+artifacts/tokenizers/*/corpus.txt
+
+# Local assistant config
+.claude/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/

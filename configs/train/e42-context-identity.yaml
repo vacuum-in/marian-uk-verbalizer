@@ -1,0 +1,32 @@
+# E42 adds to E41 (data/e42_context_identity, 420,204 rows):
+#  - 33,420 identity pairs from training-split book prose (identity 4.7% -> 11.7%),
+#    because E41 keeps only 64% of held-out book sentences unchanged;
+#  - 7,000 cards/IBANs/phones/coordinates inserted into real book sentences,
+#    because E41 reads the number but damages the words after it;
+#  - 8,000 English lists of 5-12 words and 3,000 contiguous zero-run cards.
+# Fine-tuned from E41 on the RTX 5090 (same footprint as E40/E41).
+experiment_name: e42-context-identity
+seed: 4201
+train_data: data/e42_context_identity/train.parquet
+validation_data: data/e42_context_identity/dev-stratified.parquet
+tokenizer: artifacts/tokenizers/spm-16k
+model_config: configs/model/marian-base-scaled.yaml
+output_dir: outputs/e42-context-identity
+input_preprocessing: model-routing-v1
+epochs: 2
+learning_rate: 0.00005
+weight_decay: 0.01
+warmup_ratio: 0.02
+label_smoothing: 0.0
+max_source_tokens: 384
+max_target_tokens: 384
+max_batch_tokens: 4096
+max_batch_examples: 16
+gradient_accumulation_steps: 2
+gradient_clipping: 1.0
+precision: bf16
+num_workers: 0
+log_steps: 500
+eval_steps: 3000
+eval_max_batches: 128
+save_steps: 3000

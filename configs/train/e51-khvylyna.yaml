@@ -1,0 +1,30 @@
+# E51 = E50 data with two target corrections (data/e51_khvylyna, 536,262 rows):
+#  - angular minutes: "мінута/мінути/мінут" -> "хвилина/хвилини/хвилин" in 9,809
+#    targets (user correction: "мінута" is not Ukrainian); coordinate generator fixed;
+#  - 111 letter-spelled acronyms left unread in targets now spelled (ЦРУ 3x).
+# Fine-tuned from E50 on the RTX 5090.
+experiment_name: e51-khvylyna
+seed: 5101
+train_data: data/e51_khvylyna/train.parquet
+validation_data: data/e51_khvylyna/dev-stratified.parquet
+output_dir: outputs/e51-khvylyna
+tokenizer: artifacts/tokenizers/spm-16k
+model_config: configs/model/marian-base-scaled.yaml
+input_preprocessing: model-routing-v1
+epochs: 2
+learning_rate: 0.00005
+weight_decay: 0.01
+warmup_ratio: 0.02
+label_smoothing: 0.0
+max_source_tokens: 384
+max_target_tokens: 384
+max_batch_tokens: 4096
+max_batch_examples: 16
+gradient_accumulation_steps: 2
+gradient_clipping: 1.0
+precision: bf16
+num_workers: 0
+log_steps: 500
+eval_steps: 3000
+eval_max_batches: 128
+save_steps: 3000

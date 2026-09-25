@@ -1,0 +1,16 @@
+encoder_layers: 6
+decoder_layers: 6
+d_model: 512
+encoder_attention_heads: 8
+decoder_attention_heads: 8
+encoder_ffn_dim: 2048
+decoder_ffn_dim: 2048
+dropout: 0.1
+attention_dropout: 0.0
+activation_dropout: 0.0
+activation_function: gelu
+max_position_embeddings: 384
+share_encoder_decoder_embeddings: true
+tie_word_embeddings: true
+scale_embedding: true
+

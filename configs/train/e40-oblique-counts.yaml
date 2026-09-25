@@ -1,0 +1,37 @@
+# E37 fixes the two dataset defects found by scripts/audit_numeric_targets.py
+# and retrains so the model stops reproducing them.
+#
+#  - 3 rows whose target carried ungrammatical numeral/noun agreement
+#    ("сто сімдесят один людей чекають") were dropped rather than rewritten.
+#  - 5,855 rows were re-emitted with thousands separators stripped from the
+#    SOURCE and the already-reviewed TARGET kept, so "1 001" and "1001" map to
+#    the same verified reading. Previously bare 4-digit numbers were almost all
+#    years, and the model read 3001 as "тридцять тисяч".
+#
+# Fine-tuned from E36b (82.15%) at the 4096/16 footprint that completed without
+# the WSL2 CUDA residency fault.
+experiment_name: e40-oblique-counts
+seed: 4001
+train_data: data/e40_oblique_counts/train.parquet
+validation_data: data/e40_oblique_counts/dev-stratified.parquet
+tokenizer: artifacts/tokenizers/spm-16k
+model_config: configs/model/marian-base-scaled.yaml
+output_dir: outputs/e40-oblique-counts
+input_preprocessing: model-routing-v1
+epochs: 2
+learning_rate: 0.00005
+weight_decay: 0.01
+warmup_ratio: 0.02
+label_smoothing: 0.0
+max_source_tokens: 384
+max_target_tokens: 384
+max_batch_tokens: 4096
+max_batch_examples: 16
+gradient_accumulation_steps: 2
+gradient_clipping: 1.0
+precision: bf16
+num_workers: 0
+log_steps: 500
+eval_steps: 3000
+eval_max_batches: 128
+save_steps: 3000

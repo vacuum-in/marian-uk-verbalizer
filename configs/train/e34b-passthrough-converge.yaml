@@ -1,0 +1,36 @@
+# E34b converges the pass-through run that a transient CUDA driver fault killed
+# at step ~13,750.
+#
+# E34 dipped to 76.01% at step 7,500 while the learning rate was near its peak,
+# then recovered to 79.04% by 12,500 as it decayed -- with non-Latin rows
+# already above E32 (84.04% vs 83.53%) and pass-through 32/36 vs 31/36.
+# Latin rows were still down (71.35% vs 73.25%), which is the part convergence
+# should recover.
+#
+# Resumes from checkpoint-12500 at a third of the learning rate so the schedule
+# finishes decaying instead of restarting the disruption.
+experiment_name: e34b-passthrough-converge
+seed: 3402
+train_data: data/e34_passthrough_balance/train.parquet
+validation_data: data/e34_passthrough_balance/dev-stratified.parquet
+tokenizer: artifacts/tokenizers/spm-16k
+model_config: configs/model/marian-base-scaled.yaml
+output_dir: outputs/e34b-passthrough-converge
+input_preprocessing: model-routing-v1
+epochs: 3
+learning_rate: 0.00003
+weight_decay: 0.01
+warmup_ratio: 0.01
+label_smoothing: 0.0
+max_source_tokens: 384
+max_target_tokens: 384
+max_batch_tokens: 12288
+max_batch_examples: 48
+gradient_accumulation_steps: 1
+gradient_clipping: 1.0
+precision: bf16
+num_workers: 2
+log_steps: 250
+eval_steps: 2000
+eval_max_batches: 128
+save_steps: 2000

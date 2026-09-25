@@ -1,0 +1,39 @@
+# E36 retrains from scratch on the best corpus.
+#
+# E35 (81.79%) is a fine-tune of E34b, which is a fine-tune of E34, which is a
+# fine-tune of E32. Four stacked schedules, each with its own warmup and decay,
+# on four different corpora. E32 -- the only from-scratch run at this size --
+# reached 79.48% on a corpus that lacked pass-through supervision, the v18
+# transducer split and the cmudict pairs the E36 corpus now has.
+#
+# A single clean schedule over the full 298,894-row corpus removes the
+# accumulated schedule noise and gives the model 12 uninterrupted epochs on
+# every signal at once, which is the pattern that has paid at every stage.
+#
+# Batch stays at E35's 32x8192, which completed without the CUDA driver fault
+# that killed two runs at 48x12288, and saves are frequent for the same reason.
+experiment_name: e36-clean-long
+seed: 3601
+train_data: data/e36_cmudict_growth/train.parquet
+validation_data: data/e36_cmudict_growth/dev-stratified.parquet
+tokenizer: artifacts/tokenizers/spm-16k
+model_config: configs/model/marian-base-scaled.yaml
+output_dir: outputs/e36-clean-long
+input_preprocessing: model-routing-v1
+epochs: 12
+learning_rate: 0.0003
+weight_decay: 0.01
+warmup_ratio: 0.04
+label_smoothing: 0.0
+max_source_tokens: 384
+max_target_tokens: 384
+max_batch_tokens: 8192
+max_batch_examples: 32
+gradient_accumulation_steps: 1
+gradient_clipping: 1.0
+precision: bf16
+num_workers: 2
+log_steps: 500
+eval_steps: 4000
+eval_max_batches: 128
+save_steps: 4000

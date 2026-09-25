@@ -1,0 +1,35 @@
+# E33 pushes the capacity lever again, because E32 showed it was the real
+# bottleneck and not, as the coverage analysis suggested, an unfixable data gap.
+#
+# Going 23M -> 52.7M params moved the benchmark 66.33% -> 79.48%, and almost all
+# of that came from exactly the rows the coverage argument said were hopeless:
+# Latin-bearing rows went 47.78% -> 73.25%. The model was not short of
+# transliteration examples, it was short of parameters to generalize them.
+#
+# marian-large-pipeline: 6+6 layers, d_model 768, ~111M params. Same corpus,
+# same schedule shape as E32, batch reduced to fit the larger model on 8 GB.
+experiment_name: e33-capacity-large
+seed: 3301
+train_data: data/e32_transliteration_scale/train.parquet
+validation_data: data/e32_transliteration_scale/dev-stratified.parquet
+tokenizer: artifacts/tokenizers/spm-16k
+model_config: configs/model/marian-large-pipeline.yaml
+output_dir: outputs/e33-capacity-large
+input_preprocessing: model-routing-v1
+epochs: 10
+learning_rate: 0.0003
+weight_decay: 0.01
+warmup_ratio: 0.05
+label_smoothing: 0.0
+max_source_tokens: 384
+max_target_tokens: 384
+max_batch_tokens: 6144
+max_batch_examples: 24
+gradient_accumulation_steps: 2
+gradient_clipping: 1.0
+precision: bf16
+num_workers: 2
+log_steps: 250
+eval_steps: 2500
+eval_max_batches: 128
+save_steps: 2500

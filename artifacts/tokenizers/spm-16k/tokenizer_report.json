@@ -1,0 +1,73 @@
+{
+  "config": {
+    "character_coverage": 1.0,
+    "input": "data/pilot/train.parquet",
+    "model_max_length": 384,
+    "model_type": "unigram",
+    "normalization_rule_name": "identity",
+    "output_dir": "artifacts/tokenizers/spm-16k",
+    "user_defined_symbols": [
+      "<KEEP_0>",
+      "<KEEP_1>",
+      "<KEEP_2>",
+      "<KEEP_3>",
+      "<KEEP_4>",
+      "<KEEP_5>",
+      "<KEEP_6>",
+      "<KEEP_7>",
+      "<KEEP_8>",
+      "<KEEP_9>",
+      "<KEEP_10>",
+      "<KEEP_11>",
+      "<KEEP_12>",
+      "<KEEP_13>",
+      "<KEEP_14>",
+      "<KEEP_15>",
+      "<KEEP_16>",
+      "<KEEP_17>",
+      "<KEEP_18>",
+      "<KEEP_19>",
+      "<KEEP_20>",
+      "<KEEP_21>",
+      "<KEEP_22>",
+      "<KEEP_23>",
+      "<KEEP_24>",
+      "<KEEP_25>",
+      "<KEEP_26>",
+      "<KEEP_27>",
+      "<KEEP_28>",
+      "<KEEP_29>",
+      "<KEEP_30>",
+      "<KEEP_31>"
+    ],
+    "vocab_size": 16000
+  },
+  "files": {
+    "source.spm": "de8d503a8c321617ea0ba65b82539e50fd255dda0e5e6e5fc57bed5a55dfbd58",
+    "special_tokens_map.json": "5e4d1f5e759d74cb1c2fe1d165cfc62b5237aa904de759380cd6f43042eec723",
+    "spm.model": "de8d503a8c321617ea0ba65b82539e50fd255dda0e5e6e5fc57bed5a55dfbd58",
+    "spm.vocab": "82873d43cf1482382eed4b7ae256fb97400fabc39c80122bac67ea214f9dbad9",
+    "target.spm": "de8d503a8c321617ea0ba65b82539e50fd255dda0e5e6e5fc57bed5a55dfbd58",
+    "tokenizer_config.json": "17b6258e79f82cdcc7e556dfd45d306fe30bfc81885dafee3589f75a473dfb96",
+    "vocab.json": "0f11e1d7404edd5176fe1aa82561207fcbc489adac41b7f5b957feecbc1c9cc2"
+  },
+  "rows": 100000,
+  "source_lengths": {
+    "max": 548,
+    "mean": 33.547,
+    "p95": 65
+  },
+  "special_token_ids": {
+    "decoder_start": 0,
+    "eos": 2,
+    "pad": 0,
+    "unk": 1
+  },
+  "target_lengths": {
+    "max": 519,
+    "mean": 37.299,
+    "p95": 71
+  },
+  "unknown_pieces": 0,
+  "vocab_size": 16000
+}

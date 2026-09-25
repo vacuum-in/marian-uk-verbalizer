@@ -1,0 +1,32 @@
+# E47 adds to E46 (data/e47_money_pairs) the value errors E46 still makes on
+# book text ("3.50$" -> "три тисячі п'ятсот доларів", "2456-2781" -> "два
+# мільярди ...", "15-20 центів" -> "п'ятнадцяте центів"):
+#  - ~4,000 money amounts with dot decimals and currency signs;
+#  - ~1,900 dash-joined pairs of 4-digit numbers;
+#  - ~1,700 quantity ranges followed by a currency word.
+# Fine-tuned from E46 on the RTX 5090.
+experiment_name: e47-money-pairs
+seed: 4701
+train_data: data/e47_money_pairs/train.parquet
+validation_data: data/e47_money_pairs/dev-stratified.parquet
+output_dir: outputs/e47-money-pairs
+tokenizer: artifacts/tokenizers/spm-16k
+model_config: configs/model/marian-base-scaled.yaml
+input_preprocessing: model-routing-v1
+epochs: 2
+learning_rate: 0.00005
+weight_decay: 0.01
+warmup_ratio: 0.02
+label_smoothing: 0.0
+max_source_tokens: 384
+max_target_tokens: 384
+max_batch_tokens: 4096
+max_batch_examples: 16
+gradient_accumulation_steps: 2
+gradient_clipping: 1.0
+precision: bf16
+num_workers: 0
+log_steps: 500
+eval_steps: 3000
+eval_max_batches: 128
+save_steps: 3000

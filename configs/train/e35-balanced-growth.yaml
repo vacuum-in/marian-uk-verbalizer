@@ -1,0 +1,40 @@
+# E35 stops the two gains from cancelling.
+#
+# E34b showed pass-through supervision and transliteration competing: +1.78 on
+# the Ukrainian benchmark, -5.38 on the English holdout. The E35 corpus keeps
+# all 15,000 pass-through rows and adds 15,879 reviewed transducer pairs that
+# no Marian corpus had ever pulled in (v18-clean-three-provider and two smaller
+# splits), lifting English from ~17.5% to 19.28% of rows while identity holds
+# at 5.25%.
+#
+# Initialized from E34b, the current Ukrainian best (81.26%), because the weak
+# domain is the one the new data feeds.
+#
+# Batch is reduced from E34's 48x12288 after two transient CUDA driver faults
+# ("device not ready" in lm_head) killed runs at that throughput, and saves are
+# frequent so a third fault costs little.
+experiment_name: e35-balanced-growth
+seed: 3501
+train_data: data/e35_balanced_growth/train.parquet
+validation_data: data/e35_balanced_growth/dev-stratified.parquet
+tokenizer: artifacts/tokenizers/spm-16k
+model_config: configs/model/marian-base-scaled.yaml
+output_dir: outputs/e35-balanced-growth
+input_preprocessing: model-routing-v1
+epochs: 3
+learning_rate: 0.00006
+weight_decay: 0.01
+warmup_ratio: 0.02
+label_smoothing: 0.0
+max_source_tokens: 384
+max_target_tokens: 384
+max_batch_tokens: 8192
+max_batch_examples: 32
+gradient_accumulation_steps: 1
+gradient_clipping: 1.0
+precision: bf16
+num_workers: 2
+log_steps: 250
+eval_steps: 2000
+eval_max_batches: 128
+save_steps: 2000

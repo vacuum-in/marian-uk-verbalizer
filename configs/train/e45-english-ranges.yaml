@@ -1,0 +1,31 @@
+# E45 adds to E44 (data/e45_english_ranges, 484,136 rows):
+#  - 15,000 English rows: words inside real book sentences, lists, pairs,
+#    because English slipped 87.2% -> 86.6% -> 86.2% over E42-E44;
+#  - 4,681 quantity ranges ("5-10 днів" -> "від п'яти до десяти днів") and
+#    1,996 year spans, because book ranges read at 36%.
+# Fine-tuned from E44 on the RTX 5090.
+experiment_name: e45-english-ranges
+seed: 4501
+train_data: data/e45_english_ranges/train.parquet
+validation_data: data/e45_english_ranges/dev-stratified.parquet
+output_dir: outputs/e45-english-ranges
+tokenizer: artifacts/tokenizers/spm-16k
+model_config: configs/model/marian-base-scaled.yaml
+input_preprocessing: model-routing-v1
+epochs: 2
+learning_rate: 0.00005
+weight_decay: 0.01
+warmup_ratio: 0.02
+label_smoothing: 0.0
+max_source_tokens: 384
+max_target_tokens: 384
+max_batch_tokens: 4096
+max_batch_examples: 16
+gradient_accumulation_steps: 2
+gradient_clipping: 1.0
+precision: bf16
+num_workers: 0
+log_steps: 500
+eval_steps: 3000
+eval_max_batches: 128
+save_steps: 3000

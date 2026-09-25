@@ -1,0 +1,30 @@
+# E49 adds to E48 (data/e49_acronyms) ~7,850 Cyrillic acronyms spelled letter
+# by letter (random letter combinations shaped like СБУ/ФБР, in training-only
+# frames and book sentences). A user found "у ФБР" -> "у еф еф бе ер"; E48
+# also garbles ФСБ and leaves ЦРУ unread. Real acronyms in
+# reports/domain-eval/acronyms.jsonl are never generated. Fine-tuned from E48.
+experiment_name: e49-acronyms
+seed: 4901
+train_data: data/e49_acronyms/train.parquet
+validation_data: data/e49_acronyms/dev-stratified.parquet
+output_dir: outputs/e49-acronyms
+tokenizer: artifacts/tokenizers/spm-16k
+model_config: configs/model/marian-base-scaled.yaml
+input_preprocessing: model-routing-v1
+epochs: 2
+learning_rate: 0.00005
+weight_decay: 0.01
+warmup_ratio: 0.02
+label_smoothing: 0.0
+max_source_tokens: 384
+max_target_tokens: 384
+max_batch_tokens: 4096
+max_batch_examples: 16
+gradient_accumulation_steps: 2
+gradient_clipping: 1.0
+precision: bf16
+num_workers: 0
+log_steps: 500
+eval_steps: 3000
+eval_max_batches: 128
+save_steps: 3000

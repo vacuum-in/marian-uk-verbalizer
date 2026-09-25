@@ -1,0 +1,38 @@
+# E34 fixes over-verbalization on the proven 52.7M architecture.
+#
+# E32 reached 79.48% but started transforming text that needs nothing done to
+# it -- "дефіциту" -> "еф ес терабайт", "дід" -> "ді" -- and pass-through
+# accuracy fell 36/36 to 31/36. Only 0.23% of its corpus was identity pairs
+# against 1.00% of the benchmark. The E34 corpus adds 15,000 reviewed
+# requires_change=False rows, lifting that to 5.54%.
+#
+# E33 tested 112M params on the same data and tracked ~33% worse eval loss at
+# every checkpoint without converging (ratio 1.30 -> 1.32 -> 1.34), so capacity
+# is not the next lever at this data budget. This run stays at 52.7M and
+# initializes from E32 rather than restarting, since E32's capability is what
+# we are correcting, not replacing.
+experiment_name: e34-passthrough-balance
+seed: 3401
+train_data: data/e34_passthrough_balance/train.parquet
+validation_data: data/e34_passthrough_balance/dev-stratified.parquet
+tokenizer: artifacts/tokenizers/spm-16k
+model_config: configs/model/marian-base-scaled.yaml
+output_dir: outputs/e34-passthrough-balance
+input_preprocessing: model-routing-v1
+epochs: 6
+learning_rate: 0.0001
+weight_decay: 0.01
+warmup_ratio: 0.03
+label_smoothing: 0.0
+max_source_tokens: 384
+max_target_tokens: 384
+max_batch_tokens: 12288
+max_batch_examples: 48
+gradient_accumulation_steps: 1
+gradient_clipping: 1.0
+precision: bf16
+num_workers: 2
+log_steps: 250
+eval_steps: 2500
+eval_max_batches: 128
+save_steps: 2500

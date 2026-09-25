@@ -1,0 +1,32 @@
+# E41 adds 35,637 checker-verified rows for the domains the held-out domain
+# sets exposed (reports/domain-eval): cards, IBANs, phones (incl. bracketed
+# area codes), DMS/decimal coordinates, and English word lists. E40 scored
+# 28.8% / 74.4% / 16.6% / 77.6% on card_iban / phone / coordinates / english.
+#
+# Fine-tuned from E40 at the same 4096/16 footprint that avoids the WSL2 CUDA
+# residency fault.
+experiment_name: e41-domain-growth
+seed: 4101
+train_data: data/e41_domain_growth/train.parquet
+validation_data: data/e41_domain_growth/dev-stratified.parquet
+tokenizer: artifacts/tokenizers/spm-16k
+model_config: configs/model/marian-base-scaled.yaml
+output_dir: outputs/e41-domain-growth
+input_preprocessing: model-routing-v1
+epochs: 2
+learning_rate: 0.00005
+weight_decay: 0.01
+warmup_ratio: 0.02
+label_smoothing: 0.0
+max_source_tokens: 384
+max_target_tokens: 384
+max_batch_tokens: 4096
+max_batch_examples: 16
+gradient_accumulation_steps: 2
+gradient_clipping: 1.0
+precision: bf16
+num_workers: 0
+log_steps: 500
+eval_steps: 3000
+eval_max_batches: 128
+save_steps: 3000

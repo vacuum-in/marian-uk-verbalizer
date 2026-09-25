@@ -1,0 +1,7 @@
+FROM pytorch/pytorch:2.8.0-cuda12.8-cudnn9-runtime
+
+WORKDIR /workspace
+
+COPY requirements.lock ./
+RUN grep -v '^torch==' requirements.lock > /tmp/requirements.txt \
+    && pip install --no-cache-dir -r /tmp/requirements.txt 'mlflow>=2.22,<3'

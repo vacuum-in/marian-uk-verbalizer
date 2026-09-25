@@ -1,0 +1,42 @@
+# E32 tests capacity, the one lever never tried. E30 (orthography) and E31
+# (corpus recovery) were both data fixes and together moved the benchmark
+# 34.83% -> 66.33%. The residual error is concentrated in Latin-bearing rows
+# (47.78% vs 78.39%), and those categories are NOT short of data:
+# "Пакет V: транслітерація в реченні" alone has 23,079 training rows and 42.5%
+# of the corpus is already Latin-related. Abundant data that still fails points
+# at model capacity, not sampling.
+#
+# marian-base: 6+6 layers, d_model 512, 52.7M params, against the 23M used
+# since E1. Trained from scratch -- layer and embedding shapes differ from E31,
+# so there is nothing to initialize from.
+#
+# Full-GPU configuration. A first attempt at lr 7e-4 with marian-base.yaml
+# (scale_embedding: false) plateaued at loss 6.5 / perplexity 650 -- it never
+# left unigram statistics. Every config in this repo that trained from scratch
+# successfully uses scale_embedding: true and lr 3e-4..5e-4, so this run matches
+# that: marian-base-scaled at 3e-4 with 5% warmup.
+experiment_name: e32-capacity-base
+seed: 3201
+train_data: data/e32_transliteration_scale/train.parquet
+validation_data: data/e32_transliteration_scale/dev-stratified.parquet
+tokenizer: artifacts/tokenizers/spm-16k
+model_config: configs/model/marian-base-scaled.yaml
+output_dir: outputs/e32-capacity-base
+input_preprocessing: model-routing-v1
+epochs: 10
+learning_rate: 0.0003
+weight_decay: 0.01
+warmup_ratio: 0.05
+label_smoothing: 0.0
+max_source_tokens: 384
+max_target_tokens: 384
+max_batch_tokens: 12288
+max_batch_examples: 48
+gradient_accumulation_steps: 1
+gradient_clipping: 1.0
+precision: bf16
+num_workers: 2
+log_steps: 250
+eval_steps: 2500
+eval_max_batches: 128
+save_steps: 2500
