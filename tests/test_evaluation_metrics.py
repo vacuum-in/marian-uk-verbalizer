@@ -94,3 +94,16 @@ def test_numeric_release_metrics_are_reported_separately() -> None:
     assert overall["numeric_value_fidelity"] == 1.0
     assert overall["identifier_group_fidelity"] is None
     assert overall["contextual_morphology_accuracy"] is None
+
+
+def test_spoken_match_ignores_only_what_is_not_heard() -> None:
+    from src.verbalizer.evaluation.metrics import add_example, empty_totals, finalize, spoken_form
+
+    assert spoken_form("За добу сталося 3-4 Де те пе.") == spoken_form("за добу сталося 3 4 де-те-пе")
+    assert spoken_form("п’ять") == spoken_form("п'ять")
+    assert spoken_form("дванадцять дверей") != spoken_form("дванадцяте дверей")
+    totals = empty_totals()
+    add_example(totals, "у ДТП", "у Де те пе", "у де-те-пе.")
+    report = finalize(totals)
+    assert report["exact_match"] == 0.0
+    assert report["spoken_match"] == 1.0

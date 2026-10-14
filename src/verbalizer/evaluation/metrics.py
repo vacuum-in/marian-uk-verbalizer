@@ -22,6 +22,16 @@ def normalize_evaluation_text(value: str) -> str:
     return re.sub(r"\s+([.,;:!?])", r"\1", value)
 
 
+def spoken_form(value: str) -> str:
+    """What a listener can tell apart: case, punctuation and hyphens are not heard.
+
+    Evaluation only; nothing at runtime uses it. "Де те пе." and "де-те-пе" are the same
+    utterance, "дванадцяте" and "дванадцять" are not.
+    """
+    value = unicodedata.normalize("NFC", value).casefold().replace("ʼ", "'").replace("’", "'")
+    return " ".join(re.findall(r"[^\W_]+(?:'[^\W_]+)*", value))
+
+
 def edit_distance(left: Sequence[Any], right: Sequence[Any]) -> int:
     if left == right:
         return 0
@@ -72,6 +82,7 @@ def empty_totals() -> dict[str, int]:
         "contextual_morphology_rows": 0,
         "contextual_morphology_exact": 0,
         "numeric_model_rejected": 0,
+        "spoken_exact": 0,
     }
 
 
@@ -144,6 +155,7 @@ def add_example(
     ]
     totals["rows"] += 1
     totals["exact"] += int(reference == prediction)
+    totals["spoken_exact"] += int(spoken_form(reference) == spoken_form(prediction))
     totals["character_edits"] += edit_distance(reference, prediction)
     totals["reference_characters"] += len(reference)
     totals["word_edits"] += edit_distance(reference_words, prediction_words)
@@ -195,6 +207,7 @@ def finalize(totals: dict[str, int]) -> dict[str, int | float | None]:
     return {
         **totals,
         "exact_match": totals["exact"] / rows if rows else 0.0,
+        "spoken_match": totals.get("spoken_exact", 0) / rows if rows else 0.0,
         "cer": totals["character_edits"] / max(1, totals["reference_characters"]),
         "wer": totals["word_edits"] / max(1, totals["reference_words"]),
         "identity_accuracy": totals["identity_exact"] / identity_rows if identity_rows else None,

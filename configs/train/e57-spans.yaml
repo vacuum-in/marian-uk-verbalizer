@@ -1,0 +1,28 @@
+# E57: E56 with a wider span detector (units after "/", capitalised abbreviations, abbreviations and currency
+# after numbers and Roman numerals, hashtags, handles, ©) and without doubling the E52 Roman data, which had pushed
+# Roman numerals after names to the dative ("з Філіппом II" -> "другому").
+experiment_name: e57-spans
+seed: 5501
+train_data: data/e57_spans/train.parquet
+validation_data: data/e57_spans/dev.parquet
+output_dir: outputs/e57-spans
+tokenizer: artifacts/tokenizers/spm-16k
+model_config: configs/model/marian-base-scaled.yaml
+input_preprocessing: raw
+epochs: 2
+learning_rate: 0.00005
+weight_decay: 0.01
+warmup_ratio: 0.02
+label_smoothing: 0.0
+max_source_tokens: 192
+max_target_tokens: 96
+max_batch_tokens: 8192
+max_batch_examples: 64
+gradient_accumulation_steps: 1
+gradient_clipping: 1.0
+precision: bf16
+num_workers: 0
+log_steps: 200
+eval_steps: 3000
+eval_max_batches: 64
+save_steps: 10000

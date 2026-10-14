@@ -1,0 +1,26 @@
+# E61: E60 trained one more epoch on the same data at 2e-5 (initialised from E60).
+experiment_name: e61-spans
+seed: 6101
+train_data: data/e60_spans/train.parquet
+validation_data: data/e60_spans/dev.parquet
+output_dir: outputs/e61-spans
+tokenizer: artifacts/tokenizers/spm-16k
+model_config: configs/model/marian-base-scaled.yaml
+input_preprocessing: raw
+epochs: 1
+learning_rate: 0.00002
+weight_decay: 0.01
+warmup_ratio: 0.02
+label_smoothing: 0.0
+max_source_tokens: 192
+max_target_tokens: 96
+max_batch_tokens: 8192
+max_batch_examples: 64
+gradient_accumulation_steps: 1
+gradient_clipping: 1.0
+precision: bf16
+num_workers: 0
+log_steps: 200
+eval_steps: 3000
+eval_max_batches: 64
+save_steps: 10000

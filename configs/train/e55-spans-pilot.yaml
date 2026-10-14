@@ -1,0 +1,28 @@
+# E55 span pilot: E54 warm-started on the span-to-span task. The input is the sentence (cut to 40 words each side)
+# with one span marked [[ ]]; the target is that span's spoken form only (data/e55_spans, built by
+# scripts/build_span_data.py from E54's training pairs; 15% of pairs add one ordinary word read as itself).
+experiment_name: e55-spans-pilot
+seed: 5501
+train_data: data/e55_spans/train.parquet
+validation_data: data/e55_spans/dev.parquet
+output_dir: outputs/e55-spans-pilot
+tokenizer: artifacts/tokenizers/spm-16k
+model_config: configs/model/marian-base-scaled.yaml
+input_preprocessing: raw
+epochs: 1
+learning_rate: 0.0001
+weight_decay: 0.01
+warmup_ratio: 0.02
+label_smoothing: 0.0
+max_source_tokens: 192
+max_target_tokens: 96
+max_batch_tokens: 8192
+max_batch_examples: 64
+gradient_accumulation_steps: 1
+gradient_clipping: 1.0
+precision: bf16
+num_workers: 0
+log_steps: 200
+eval_steps: 3000
+eval_max_batches: 64
+save_steps: 3000
