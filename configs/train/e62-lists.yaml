@@ -1,0 +1,27 @@
+# E62: E60 trained one epoch further (3e-5) on 400k of its rows plus 38k rows for numbered lists, Roman section
+# headings and ordinary words in capitals (scripts/build_e62_lists.py).
+experiment_name: e62-lists
+seed: 5501
+train_data: data/e62_spans/train.parquet
+validation_data: data/e62_spans/dev.parquet
+output_dir: outputs/e62-lists
+tokenizer: artifacts/tokenizers/spm-16k
+model_config: configs/model/marian-base-scaled.yaml
+input_preprocessing: raw
+epochs: 1
+learning_rate: 0.00003
+weight_decay: 0.01
+warmup_ratio: 0.02
+label_smoothing: 0.0
+max_source_tokens: 192
+max_target_tokens: 96
+max_batch_tokens: 8192
+max_batch_examples: 64
+gradient_accumulation_steps: 1
+gradient_clipping: 1.0
+precision: bf16
+num_workers: 0
+log_steps: 200
+eval_steps: 3000
+eval_max_batches: 64
+save_steps: 10000

@@ -1,0 +1,27 @@
+# E69 (seed 6902): E68 plus 12k rows of grouped decimals with units, durations, temperature ranges, ratios, rates, leading zeros; E68 = E67 plus 30k rows after a second business page (dates and times after prepositions, contracts, units, IP, version lists, case after prepositions); E67 = E66 plus 12k rows of amounts in a row, exchange rates, ratios and fractions, document numbers; E66 = the E65 mix plus 41k business and technical rows (scripts/build_e68_business.py): grouped thousands, versions,
+# signed temperatures, small decimals, €/£ amounts, 00:xx times, time ranges, weekday ranges (x6), ÷, sizes, dates in 2000-2009.
+experiment_name: e69-s6902
+seed: 6902
+train_data: data/e69_spans/train.parquet
+validation_data: data/e69_spans/dev.parquet
+output_dir: outputs/e69-s6902
+tokenizer: artifacts/tokenizers/spm-16k
+model_config: configs/model/marian-base-scaled.yaml
+input_preprocessing: raw
+epochs: 1
+learning_rate: 0.00003
+weight_decay: 0.01
+warmup_ratio: 0.02
+label_smoothing: 0.0
+max_source_tokens: 192
+max_target_tokens: 96
+max_batch_tokens: 8192
+max_batch_examples: 64
+gradient_accumulation_steps: 1
+gradient_clipping: 1.0
+precision: bf16
+num_workers: 0
+log_steps: 200
+eval_steps: 3000
+eval_max_batches: 64
+save_steps: 10000

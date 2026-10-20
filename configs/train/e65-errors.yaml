@@ -1,0 +1,27 @@
+# E65: E64 with day ranges cut to 1.5k rows (5k taught "20–25 піхотинців" to read as dates); the E62 mix plus 17k rows for the error types E62 makes on real text (scripts/build_e65_errors.py):
+# OCR'd "3" for З, years and life spans in parentheses, day ranges and pairs, BC years, footnote numbers.
+experiment_name: e65-errors
+seed: 6501
+train_data: data/e65_spans/train.parquet
+validation_data: data/e65_spans/dev.parquet
+output_dir: outputs/e65-errors
+tokenizer: artifacts/tokenizers/spm-16k
+model_config: configs/model/marian-base-scaled.yaml
+input_preprocessing: raw
+epochs: 1
+learning_rate: 0.00003
+weight_decay: 0.01
+warmup_ratio: 0.02
+label_smoothing: 0.0
+max_source_tokens: 192
+max_target_tokens: 96
+max_batch_tokens: 8192
+max_batch_examples: 64
+gradient_accumulation_steps: 1
+gradient_clipping: 1.0
+precision: bf16
+num_workers: 0
+log_steps: 200
+eval_steps: 3000
+eval_max_batches: 64
+save_steps: 10000

@@ -135,7 +135,7 @@ def main() -> int:
             ref = r.get("reference")
             if not ref or len(ref) < 0.5 * len(r["sentence"]):
                 continue
-            rows.append({"src": r["sentence"], "refs": [ref], "marian": r["marian"], "gemma": r["gemma"],
+            rows.append({"src": r["sentence"], "refs": r.get("references") or [ref], "marian": r["marian"], "gemma": r["gemma"],
                          "classes": r.get("classes", ["?"])})
         for r, o in zip(rows, v.verbalize([r["src"] for r in rows])):
             r["span"] = o
@@ -146,7 +146,7 @@ def main() -> int:
             per[r["classes"][0]].append(r)
         report["real_by_class"] = {k: {s: score(rs, s)["spoken"] for s in ("marian", "gemma", "span")}
                                    for k, rs in sorted(per.items())}
-        bad = [r for r in rows if spoken_form(r["span"]) != spoken_form(r["refs"][0])]
+        bad = [r for r in rows if not any(spoken_form(r["span"]) == spoken_form(x) for x in r["refs"])]
         report["real_errors"] = [{"in": r["src"], "out": r["span"], "ref": r["refs"][0]} for r in bad]
     shown = {k: v for k, v in report.items() if not k.endswith("_errors")}
     print(json.dumps(shown, indent=1, ensure_ascii=False))
