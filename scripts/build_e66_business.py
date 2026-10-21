@@ -40,7 +40,8 @@ GEN = {"один": "одного", "одна": "однієї", "два": "дво
        "чотириста": "чотирьохсот", "п'ятсот": "п'ятисот", "шістсот": "шестисот", "сімсот": "семисот",
        "вісімсот": "восьмисот", "дев'ятсот": "дев'ятисот", "тисяча": "тисячі", "тисячі": "тисяч", "тисяч": "тисяч",
        "нуль": "нуля", "шість": "шести", "сім": "семи", "вісім": "восьми", "ціла": "цілої", "цілих": "цілих"}
-FRAC = ["десят", "сот", "тисячн", "десятитисячн", "стотисячн", "мільйонн"]
+FRAC = ["десят", "сот", "тисячн", "десятитисячн", "стотисячн", "мільйонн", "десятимільйонн", "стомільйонн",
+        "мільярдн"]
 
 
 def card(n: int, fem: bool = False) -> str:
@@ -619,6 +620,189 @@ def k_leading_zeros(rng):
     return row(line, piece, reading, "leading-zeros")
 
 
+
+# ---- E70: abbreviations, times with seconds, dates without a year, long decimals, case after з/зі,
+#      ordinals with suffixes, digit strings with leading zeros ----
+
+ROMAN = {1: "I", 2: "II", 3: "III", 4: "IV", 5: "V", 6: "VI", 7: "VII", 8: "VIII", 9: "IX", 10: "X", 11: "XI", 12: "XII"}
+
+
+def k_quarter(rng):
+    q, y = rng.randint(1, 4), rng.randint(2015, 2030)
+    piece = f"{ROMAN[q]} кв. {y} р."
+    reading = f"{ordinal_form(q, 'masc', 'nomn')} квартал {ord_gen(y)} року"
+    line = rng.choice(["Звіт за {} готовий.", "Показники за {} гірші.", "Порівнюємо з даними за {}"]).format(piece)
+    return row(line, piece, reading, "abbrev")
+
+
+def k_pp(rng):
+    w, f = rng.randint(0, 9), str(rng.randint(1, 9))
+    if rng.random() < 0.5:
+        piece, reading = f"{w},{f} в. п.", f"{decimal(w, f)} відсоткового пункту"
+    else:
+        n = rng.randint(1, 30)
+        piece, reading = f"{n} в. п.", f"{card(n)} {plural(n, 'відсотковий пункт', 'відсоткові пункти', 'відсоткових пунктів')}"
+    line = rng.choice(["Ставка — базова + {}.", "Різниця становить {}.", "Рейтинг зріс на {}."]).format(piece)
+    if "+" in line:
+        return row(line, "+ " + piece, "плюс " + reading, "abbrev")
+    return row(line, piece, reading, "abbrev")
+
+
+LEGAL = [("ст.", "стаття", "статті", "fem"), ("ч.", "частина", "частини", "fem"), ("п.", "пункт", "пункту", "masc"),
+         ("пп.", "підпункт", "підпункту", "masc"), ("абз.", "абзац", "абзацу", "masc"), ("гл.", "глава", "глави", "fem"),
+         ("розд.", "розділ", "розділу", "masc")]
+
+
+def k_legal(rng):
+    parts = rng.sample(LEGAL, rng.randint(1, 3))
+    gen = rng.random() < 0.5
+    pieces = []
+    for ab, nom, gn, _ in parts:
+        roman = ab == "розд." and rng.random() < 0.6
+        n = rng.randint(1, 12) if roman else rng.randint(1, 40)
+        txt = f"{ab} {ROMAN[n] if roman else n}"
+        num = ordinal_form(n, "masc", "gent" if gen else "nomn") if roman else card(n)
+        pieces.append((txt, f"{gn if gen else nom} {num}"))
+    body = ", ".join(p[0] for p in pieces)
+    line = ("Відповідно до " if gen else rng.choice(["Підстава: ", "Див. ", "Посилання: "])) + body + "."
+    return row_multi(line, [rng.choice(pieces)], "abbrev")  # each piece is its own span: teach any of them
+
+
+def k_address(rng):
+    b, k, o = rng.randint(1, 150), rng.randint(1, 9), rng.randint(1, 500)
+    lit = rng.choice(["", "-А", "-Б", "-В"])
+    o_txt = str(o).zfill(rng.choice([1, 3]))
+    pieces = [(f"буд. {b}{lit}", f"будинок {card(b)}{' ' + lit[1:].lower() if lit else ''}"),
+              (f"корп. {k}", f"корпус {card(k)}"),
+              (f"оф. {o_txt}" if rng.random() < 0.5 else f"кв. {o_txt}", None)]
+    is_of = pieces[2][0].startswith("оф.")
+    digits = " ".join(["нуль"] * (len(o_txt) - len(str(o)))) + (" " if len(o_txt) > len(str(o)) else "") + card(o)
+    pieces[2] = (pieces[2][0], f"{'офіс' if is_of else 'квартира'} {digits}")
+    line = "Адреса: вул. Садова, " + ", ".join(p[0] for p in pieces) + "."
+    return row_multi(line, pieces, "abbrev")
+
+
+def k_ext(rng):
+    n = rng.randint(1, 999)
+    return row(f"Телефон приймальні, доб. {n}.", f"доб. {n}", f"додатковий {card(n)}", "abbrev")
+
+
+def k_big_abbr(rng):
+    kind = rng.choice(["тис.", "млн", "млрд"])
+    forms = {"тис.": ("тисяча", "тисячі", "тисяч", "тисячі"), "млн": ("мільйон", "мільйони", "мільйонів", "мільйона"),
+             "млрд": ("мільярд", "мільярди", "мільярдів", "мільярда")}[kind]
+    if rng.random() < 0.5:
+        n = rng.randint(1, 999)
+        val, reading = str(n), f"{card(n, fem=kind == 'тис.')} {plural(n, *forms[:3])}"
+    else:
+        w, f = rng.randint(1, 99), str(rng.randint(1, 9))
+        val, reading = f"{w},{f}", f"{decimal(w, f)} {forms[3]}"
+    cur = rng.random() < 0.5
+    piece = f"{val} {kind}" + (" грн" if cur else "")
+    reading += " гривень" if cur else ""
+    line = rng.choice(["У плані — {} витрат.", "Оборот сягнув {}.", "Заплановано {} заявок."]).format(piece)
+    return row(line, piece, reading, "abbrev")
+
+
+def k_etc(rng):
+    piece, reading = rng.choice([("т. ін.", "таке інше"), ("т. д.", "так далі"), ("та ін.", "та інші"), ("і т. п.", "і тому подібне")])
+    line = rng.choice(["Довідник містить коди, назви, адреси {}.", "Ми закупили папір, ручки, теки {}."]).format(piece)
+    return row(line, piece.split(" ", 1)[1] if piece.startswith(("та ", "і ")) else piece,
+               reading.split(" ", 1)[1] if piece.startswith(("та ", "і ")) else reading, "abbrev")
+
+
+def k_days_duration(rng):
+    d, h, m, sec = rng.randint(1, 30), rng.randint(0, 23), rng.randint(0, 59), rng.randint(1, 59)
+    piece = f"{d} д {h:02d} год {m:02d} хв {sec:02d} с"
+    reading = (f"{card(d)} {plural(d, 'день', 'дні', 'днів')} {card(h, fem=True)} {plural(h, 'година', 'години', 'годин')} "
+               f"{card(m, fem=True)} {plural(m, 'хвилина', 'хвилини', 'хвилин')} {card(sec, fem=True)} "
+               f"{plural(sec, 'секунда', 'секунди', 'секунд')}")
+    return row(f"Тривалість сеансу — {piece}.", piece, reading, "duration")
+
+
+def k_time_seconds(rng):
+    h, m, sec = rng.randint(0, 23), rng.randint(0, 59), rng.randint(0, 59)
+    piece = f"{h:02d}:{m:02d}:{sec:02d}"
+    reading = (f"{card(h, fem=True)} {plural(h, 'година', 'години', 'годин')} {card(m, fem=True)} "
+               f"{plural(m, 'хвилина', 'хвилини', 'хвилин')} {card(sec, fem=True)} {plural(sec, 'секунда', 'секунди', 'секунд')}")
+    line = rng.choice(["Мітка часу: {}.", "Запис створено о {}.", "Останній вхід — {}."]).format(piece)
+    return row(line, piece, reading, "time-seconds")
+
+
+def k_date_noyear(rng):
+    days = sorted(rng.sample(range(1, 29), rng.randint(2, 3)))
+    mth = rng.randint(1, 12)
+    pieces, parts = [], []
+    for d in days:
+        txt = f"{d:02d}.{mth:02d}"
+        rd = f"{ordinal_form(d, 'neut', 'nomn')} {MONTHS[mth - 1]}"
+        if rng.random() < 0.5:
+            h1, h2 = rng.randint(8, 11), rng.randint(13, 18)
+            tr = f"{h1:02d}:00–{h2:02d}:00"
+            pieces += [(txt, rd), (tr, f"з {ord_fem(h1, 'gent')} до {ord_fem(h2, 'gent')}")]
+            parts.append(f"{txt} — {tr}")
+        else:
+            pieces.append((txt, rd))
+            parts.append(f"{txt} — вихідний")
+    line = "Графік у святковий період: " + "; ".join(parts) + "."
+    k = rng.randrange(len(pieces))
+    return row_multi(line, pieces, "date-noyear")
+
+
+def k_long_decimal(rng):
+    k = rng.randint(5, 9)
+    w = rng.choice([0, 0, rng.randint(1, 9), rng.randint(10, 99), rng.randint(1000, 99999999)])
+    f = str(rng.randint(1, 9 if rng.random() < 0.5 else 10 ** k - 1)).zfill(k)
+    if f.endswith("0"):
+        return None
+    piece = f"{group(w)},{f}"
+    line = rng.choice(["Мінімальне значення становило {}.", "Коефіцієнт — {}.", "Отримали {} у підсумку."]).format(piece)
+    return row(line, piece, decimal(w, f), "long-decimal")
+
+
+def k_from_to_pct(rng):
+    a, b = rng.randint(1, 100), rng.randint(1, 100)
+    def g(n):
+        return f"{genitive(card(n))} {'відсотка' if n % 10 == 1 and n % 100 != 11 else 'відсотків'}"
+    prep = "зі" if a in (100,) or str(a)[0] in "7" else rng.choice(["з", "від"])
+    line = f"Заряд змінився {prep} {a}% до {b}%."
+    return row_multi(line, [(f"{a}%", g(a)), (f"{b}%", g(b))], "prep-case")
+
+
+def k_ordinal_suffix(rng):
+    sufs = [("й", "masc", "nomn"), ("га", "femn", "nomn"), ("тє", "neut", "nomn"), ("те", "neut", "nomn"), ("ті", "plur", "nomn"),
+            ("го", "masc", "gent"), ("му", "masc", "loct")]
+    items = []
+    for _ in range(rng.randint(1, 4)):
+        n = rng.choice([rng.randint(1, 30), rng.randint(31, 200), rng.choice([1001, 1000, 2001])])
+        suf, gnd, case = rng.choice(sufs)
+        w = ordinal_form(n, gnd, case) if gnd != "plur" else ordinal_form(n, "plur", "nomn")
+        if not w:
+            return None
+        items.append((f"{group(n)}-{suf}", re.sub(r"^одна тисяча", "тисяча", w)))
+    line = "Позначення: " + ", ".join(i[0] for i in items) + "."
+    k = rng.randrange(len(items))
+    return row(line, items[k][0], items[k][1], "ordinal-suffix") if line.count(items[k][0]) == 1 else None
+
+
+def k_zero_digits(rng):
+    k = rng.randint(4, 8)
+    code = "".join(rng.choice("0001") for _ in range(k)) if rng.random() < 0.6 else str(rng.randint(0, 10 ** k - 1)).zfill(k)
+    if code[0] != "0":
+        code = "0" + code[1:]
+    line = rng.choice(["Контрольна послідовність: {}.", "Код: {}; повторіть його.", "Введіть {} у поле."]).format(code)
+    return row(line, code, " ".join(card(int(c)) for c in code), "zero-digits")
+
+
+def k_no_zero(rng):
+    n = rng.randint(1, 99)
+    piece = f"№ {n:02d}" if n < 10 else f"№ {n:03d}"
+    zeros = len(piece) - 2 - len(str(n))
+    reading = "номер " + " ".join(["нуль"] * zeros + [card(n)])
+    line = rng.choice(["Сегмент {} зріс.", "Сервер {} перезавантажено.", "Вікно {} зачинене."]).format(piece)
+    return row(line, piece, reading, "zero-digits")
+
+
 KINDS = {"grouped": k_grouped, "version": k_version, "temp": k_temp, "small-decimal": k_small_decimal,
          "currency": k_currency, "time": k_midnight_time, "time-range": k_time_range, "weekdays": k_weekdays,
          "dash-words": k_dash_words, "arith": k_arith, "dims": k_dims, "date": k_date, "money-list": k_money_list,
@@ -627,8 +811,12 @@ KINDS = {"grouped": k_grouped, "version": k_version, "temp": k_temp, "small-deci
          "grouped-more": k_grouped_more, "mixed-decimal": k_mixed_decimal, "weekday-schedule": k_weekday_schedule,
          "prep-case": k_prep_case, "grouped-decimal": k_grouped_decimal, "duration": k_duration,
          "temp-range": k_temp_range, "multi-ratio": k_multi_ratio, "rate-unit": k_rate_unit,
-         "leading-zeros": k_leading_zeros}
-SHARE = {"dash-words": 0.2, "weekdays": 0.5}
+         "leading-zeros": k_leading_zeros, "quarter": k_quarter, "pp": k_pp, "legal": k_legal, "address": k_address,
+         "ext": k_ext, "big-abbr": k_big_abbr, "etc": k_etc, "days-duration": k_days_duration,
+         "time-seconds": k_time_seconds, "date-noyear": k_date_noyear, "long-decimal": k_long_decimal,
+         "from-to-pct": k_from_to_pct, "ordinal-suffix": k_ordinal_suffix, "zero-digits": k_zero_digits,
+         "no-zero": k_no_zero}
+SHARE = {"dash-words": 0.2, "weekdays": 0.5, "etc": 0.01}
 
 
 def main() -> int:

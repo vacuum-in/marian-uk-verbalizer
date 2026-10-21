@@ -1,4 +1,4 @@
-# E67: E66 plus 12k rows of amounts in a row, exchange rates, ratios and fractions, document numbers; E66 = the E65 mix plus 41k business and technical rows (scripts/build_e67_business.py): grouped thousands, versions,
+# E67: E66 plus 12k rows of amounts in a row, exchange rates, ratios and fractions, document numbers; E66 = the E65 mix plus 41k business and technical rows (scripts/build_e66_business.py): grouped thousands, versions,
 # signed temperatures, small decimals, €/£ amounts, 00:xx times, time ranges, weekday ranges (x6), ÷, sizes, dates in 2000-2009.
 experiment_name: e67-business
 seed: 6701

@@ -49,7 +49,7 @@ ATOMS = re.compile(
         # short lower-case abbreviations followed by more text: "т. ін.", "ст.", "обл.", "м."
         # (a chain like "т. ін." may end the sentence; a single short word before the final period is just a word)
         r"(?<![" + CYR + APOS + r"])[а-яіїєґ]{1,5}\.(?:\s?[а-яіїєґ]{1,5}\.)+",
-        r"(?<![" + CYR + APOS + r"])[а-яіїєґ]{1,5}\.(?=\s*[" + CYR + r"\d,;:)»—–-])",
+        r"(?<![" + CYR + APOS + r"])[а-яіїєґ]{1,5}\.(?=\s*[" + CYR + r"\dIVXLC,;:)»—–-])",  # "розд. IV" too
         # a short word before the final period may be an abbreviation ("сьогодні ср.", "на груд."); the model decides
         r"(?<![" + CYR + APOS + r"])[а-яіїєґ]{1,3}\.$",
         # stretched words: "смачнооо", "Ураааа"

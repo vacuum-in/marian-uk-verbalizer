@@ -25,6 +25,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from src.verbalizer.evaluation.metrics import spoken_form  # noqa: E402
 from src.verbalizer.spans import assemble, detect_spans, model_input  # noqa: E402
+from src.verbalizer.signs import rewrite_signs  # noqa: E402
 
 WORD = re.compile(r"[А-Яа-яІіЇїЄєҐґ'’ʼ]+")
 
@@ -79,6 +80,7 @@ class SpanVerbalizer:
         return out
 
     def verbalize(self, sentences: list[str]) -> list[str]:
+        sentences = [rewrite_signs(s) for s in sentences]  # signs the tokenizer cannot see (signs.py)
         spans = [detect_spans(s) for s in sentences]
         flat = [model_input(s, sp) for s, sps in zip(sentences, spans) for sp in sps]
         outs = iter(self._generate(flat))
